@@ -1,6 +1,6 @@
 {
     "deploy": {
-        "webroot": "public"
+        "webroot": "/public"
     },
     "hooks": {
         "postBuild": "npm install && npm run build"
