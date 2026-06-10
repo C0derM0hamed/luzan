@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\View\Composers\AdminViewComposer;
 use App\View\Composers\PublicLayoutComposer;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
     }
 
     public function boot(): void
+
     {
         View::composer([
             'layouts.app',
@@ -33,5 +35,7 @@ class AppServiceProvider extends ServiceProvider
             'layouts.admin',
             'admin.*',
         ], AdminViewComposer::class);
+
+        URL::forceScheme('https');
     }
 }
