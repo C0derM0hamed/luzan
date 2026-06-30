@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PatientReport;
 use App\Services\Otp\OtpServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class PatientPortalController extends Controller
 {
@@ -110,13 +110,26 @@ class PatientPortalController extends Controller
             abort(403, 'غير مصرح لك بالوصول إلى هذا التقرير.');
         }
 
-        if (! Storage::disk('private')->exists($report->file_path)) {
+        $path = storage_path('app/private/' . $report->file_path);
+
+        if (! File::exists($path)) {
             abort(404, 'الملف غير موجود.');
         }
 
-        return Storage::disk('private')->download(
-            $report->file_path,
-            $report->title.'.'.$report->file_type
-        );
+        $extension = strtolower($report->file_type);
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+        ];
+        
+        $mime = $mimeTypes[$extension] ?? 'application/octet-stream';
+
+        return response()->streamDownload(function () use ($path) {
+            readfile($path);
+        }, $report->title . '.' . $report->file_type, [
+            'Content-Type' => $mime
+        ]);
     }
 }

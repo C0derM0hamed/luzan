@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PatientReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class PatientReportController extends Controller
 {
@@ -38,7 +38,14 @@ class PatientReportController extends Controller
             $file = $request->file('file');
             $extension = strtolower(pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION));
             $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
-            $data['file_path'] = $file->storeAs('reports', $filename, 'private');
+            
+            $directory = storage_path('app/private/reports');
+            if (! File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+            $file->move($directory, $filename);
+            
+            $data['file_path'] = 'reports/' . $filename;
             $data['file_type'] = $extension;
         }
 
@@ -76,13 +83,23 @@ class PatientReportController extends Controller
         if ($request->hasFile('file')) {
             \App\Services\UploadValidationService::validate($request->file('file'), ['pdf', 'jpg', 'jpeg', 'png'], 'file');
             // Delete old file
-            if ($report->file_path && Storage::disk('private')->exists($report->file_path)) {
-                Storage::disk('private')->delete($report->file_path);
+            if ($report->file_path) {
+                $oldPath = storage_path('app/private/' . $report->file_path);
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
             }
             $file = $request->file('file');
             $extension = strtolower(pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION));
             $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
-            $data['file_path'] = $file->storeAs('reports', $filename, 'private');
+            
+            $directory = storage_path('app/private/reports');
+            if (! File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+            $file->move($directory, $filename);
+            
+            $data['file_path'] = 'reports/' . $filename;
             $data['file_type'] = $extension;
         }
 
@@ -95,8 +112,11 @@ class PatientReportController extends Controller
 
     public function destroy(PatientReport $report)
     {
-        if ($report->file_path && Storage::disk('private')->exists($report->file_path)) {
-            Storage::disk('private')->delete($report->file_path);
+        if ($report->file_path) {
+            $path = storage_path('app/private/' . $report->file_path);
+            if (File::exists($path)) {
+                File::delete($path);
+            }
         }
 
         $report->delete();
