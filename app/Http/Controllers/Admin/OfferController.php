@@ -30,6 +30,7 @@ class OfferController extends Controller
         $data = $this->validateOffer($request);
 
         if ($request->hasFile('image')) {
+            \App\Services\UploadValidationService::validate($request->file('image'), ['jpg', 'jpeg', 'png', 'webp', 'gif'], 'image');
             $data['image'] = $this->storeImage($request->file('image'));
         }
 
@@ -55,6 +56,7 @@ class OfferController extends Controller
         $data = $this->validateOffer($request);
 
         if ($request->hasFile('image')) {
+            \App\Services\UploadValidationService::validate($request->file('image'), ['jpg', 'jpeg', 'png', 'webp', 'gif'], 'image');
             $this->deleteImage($offer->image);
             $data['image'] = $this->storeImage($request->file('image'));
         }
@@ -81,7 +83,7 @@ class OfferController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'image' => ['nullable', 'image', 'max:2048'],
+            'image' => ['nullable', 'file', 'max:2048'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'is_active' => ['sometimes', 'boolean'],

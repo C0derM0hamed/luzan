@@ -37,6 +37,7 @@ class DoctorController extends Controller
         $branchIds = $request->input('branches', []);
 
         if ($request->hasFile('photo')) {
+            \App\Services\UploadValidationService::validate($request->file('photo'), ['jpg', 'jpeg', 'png', 'webp', 'gif'], 'photo');
             $data['photo'] = $this->storePhoto($request->file('photo'));
         } elseif ($request->filled('photo_path')) {
             $data['photo'] = $request->input('photo_path');
@@ -73,6 +74,7 @@ class DoctorController extends Controller
         $branchIds = $request->input('branches', []);
 
         if ($request->hasFile('photo')) {
+            \App\Services\UploadValidationService::validate($request->file('photo'), ['jpg', 'jpeg', 'png', 'webp', 'gif'], 'photo');
             $this->deletePhoto($doctor->photo);
             $data['photo'] = $this->storePhoto($request->file('photo'));
         } elseif ($request->filled('photo_path')) {
@@ -103,7 +105,7 @@ class DoctorController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'specialty' => ['required', 'string', 'max:255'],
             'working_hours' => ['required', 'string'],
-            'photo' => ['nullable', 'image', 'max:2048'],
+            'photo' => ['nullable', 'file', 'max:2048'],
             'photo_path' => ['nullable', 'string', 'max:255'],
             'is_active' => ['sometimes', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
@@ -113,7 +115,6 @@ class DoctorController extends Controller
             'name.required' => 'اسم الطبيب مطلوب.',
             'specialty.required' => 'التخصص مطلوب.',
             'working_hours.required' => 'ساعات العمل مطلوبة.',
-            'photo.image' => 'يجب أن تكون الصورة بصيغة صورة صالحة.',
         ]);
 
         // Remove branches from data since we sync separately

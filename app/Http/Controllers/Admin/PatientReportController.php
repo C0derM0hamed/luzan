@@ -34,9 +34,12 @@ class PatientReportController extends Controller
         $data = $this->validateReport($request);
 
         if ($request->hasFile('file')) {
+            \App\Services\UploadValidationService::validate($request->file('file'), ['pdf', 'jpg', 'jpeg', 'png'], 'file');
             $file = $request->file('file');
-            $data['file_path'] = $file->store('reports', 'private');
-            $data['file_type'] = strtolower($file->getClientOriginalExtension());
+            $extension = strtolower(pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION));
+            $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
+            $data['file_path'] = $file->storeAs('reports', $filename, 'private');
+            $data['file_type'] = $extension;
         }
 
         $data['uploaded_by'] = Auth::id();
@@ -71,13 +74,16 @@ class PatientReportController extends Controller
         $data = $this->validateReport($request, isUpdate: true);
 
         if ($request->hasFile('file')) {
+            \App\Services\UploadValidationService::validate($request->file('file'), ['pdf', 'jpg', 'jpeg', 'png'], 'file');
             // Delete old file
             if ($report->file_path && Storage::disk('private')->exists($report->file_path)) {
                 Storage::disk('private')->delete($report->file_path);
             }
             $file = $request->file('file');
-            $data['file_path'] = $file->store('reports', 'private');
-            $data['file_type'] = strtolower($file->getClientOriginalExtension());
+            $extension = strtolower(pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION));
+            $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
+            $data['file_path'] = $file->storeAs('reports', $filename, 'private');
+            $data['file_type'] = $extension;
         }
 
         $report->update($data);
@@ -109,7 +115,7 @@ class PatientReportController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['required', 'string', 'regex:/^\+?[0-9]{8,15}$/'],
             'title' => ['required', 'string', 'max:255'],
-            'file' => [$fileRule, 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            'file' => [$fileRule, 'file', 'max:10240'],
             'notes' => ['nullable', 'string'],
         ], [
             'patient_name.required' => 'اسم المريض مطلوب.',
@@ -118,7 +124,6 @@ class PatientReportController extends Controller
             'phone.regex' => 'صيغة رقم الجوال غير صحيحة. يجب أن يكون رقماً صحيحاً (وقد يبدأ بـ +).',
             'title.required' => 'عنوان التقرير مطلوب.',
             'file.required' => 'ملف التقرير مطلوب.',
-            'file.mimes' => 'يجب أن يكون الملف بصيغة PDF أو JPG أو PNG.',
             'file.max' => 'الحد الأقصى لحجم الملف 10 ميجابايت.',
         ]);
     }
