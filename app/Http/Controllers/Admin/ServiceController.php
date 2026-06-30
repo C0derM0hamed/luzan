@@ -16,7 +16,7 @@ class ServiceController extends Controller
         return view('admin.services.index', [
             'pageTitle' => 'إدارة الخدمات',
             'services' => $services,
-            'tableHeaders' => ['الاسم', 'الترتيب', 'الحالة', 'إجراءات'],
+            'tableHeaders' => ['الأيقونة', 'الاسم', 'السعر', 'الترتيب', 'الحالة', 'إجراءات'],
         ]);
     }
 
@@ -67,6 +67,8 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'icon_svg' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
+            'price' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ], [
@@ -77,6 +79,7 @@ class ServiceController extends Controller
         $validated['is_active'] = $request->boolean('is_active', true);
         $validated['sort_order'] = (int) $request->input('sort_order', 0);
         $validated['icon_svg'] = $svgSanitizer->sanitize($validated['icon_svg']);
+        $validated['price'] = $request->filled('price') ? $validated['price'] : null;
 
         return $validated;
     }

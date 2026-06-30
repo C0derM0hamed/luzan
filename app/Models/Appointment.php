@@ -14,6 +14,7 @@ class Appointment extends Model
     public const STATUS_CANCELLED = 'cancelled';
 
     protected $fillable = [
+        'branch_id',
         'full_name',
         'national_id',
         'mobile',
@@ -29,12 +30,18 @@ class Appointment extends Model
         return [
             'appointment_date' => 'date',
             'doctor_id' => 'integer',
+            'branch_id' => 'integer',
         ];
     }
 
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(Doctor::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public static function statusLabels(): array

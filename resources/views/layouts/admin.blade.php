@@ -13,7 +13,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="bg-slate-50 text-[#334155] font-sans antialiased min-h-screen" x-data="{ sidebarOpen: false }">
+<body class="bg-slate-50 text-[#334155] font-sans antialiased min-h-screen overflow-x-hidden" x-data="{ sidebarOpen: false }">
     <div class="flex min-h-screen">
         <aside
             class="fixed inset-y-0 right-0 z-40 w-64 bg-slate-900 text-slate-300 transform transition-transform duration-200 lg:translate-x-0 lg:static lg:flex-shrink-0 flex flex-col border-l border-slate-800 shadow-xl"
@@ -39,6 +39,14 @@
                 <a href="{{ route('admin.appointments.index') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 transition-all hover:bg-slate-800 hover:text-white {{ request()->routeIs('admin.appointments.*') ? 'bg-primary text-white font-semibold shadow-md shadow-primary/20' : '' }}">
                     <svg class="h-5 w-5 shrink-0 opacity-75 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     <span>المواعيد</span>
+                </a>
+                <a href="{{ route('admin.offers.index') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 transition-all hover:bg-slate-800 hover:text-white {{ request()->routeIs('admin.offers.*') ? 'bg-primary text-white font-semibold shadow-md shadow-primary/20' : '' }}">
+                    <svg class="h-5 w-5 shrink-0 opacity-75 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+                    <span>العروض</span>
+                </a>
+                <a href="{{ route('admin.reports.index') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 transition-all hover:bg-slate-800 hover:text-white {{ request()->routeIs('admin.reports.*') ? 'bg-primary text-white font-semibold shadow-md shadow-primary/20' : '' }}">
+                    <svg class="h-5 w-5 shrink-0 opacity-75 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span>تقارير المرضى</span>
                 </a>
                 <a href="{{ route('admin.branches.index') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 transition-all hover:bg-slate-800 hover:text-white {{ request()->routeIs('admin.branches.*') ? 'bg-primary text-white font-semibold shadow-md shadow-primary/20' : '' }}">
                     <svg class="h-5 w-5 shrink-0 opacity-75 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>

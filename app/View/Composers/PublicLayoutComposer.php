@@ -3,6 +3,7 @@
 namespace App\View\Composers;
 
 use App\Models\Appointment;
+use App\Models\Offer;
 use App\Models\Service;
 use App\Services\SettingService;
 use Illuminate\View\View;
@@ -31,10 +32,13 @@ class PublicLayoutComposer
             ['label' => 'الخدمات', 'url' => route('services')],
             ['label' => 'الأطباء', 'url' => route('doctors')],
             ['label' => 'حجز موعد', 'url' => route('book')],
+            ['label' => 'بوابة المرضى', 'url' => route('reports.login')],
             ['label' => 'اتصل بنا', 'url' => route('contact')],
         ];
 
         $socialLinks = $this->buildSocialLinks();
+
+        $latestOffer = Offer::query()->active()->latest()->first();
 
         $view->with([
             'clinicName' => $clinicName,
@@ -42,6 +46,7 @@ class PublicLayoutComposer
             'phone' => $phone,
             'siteEmail' => $siteEmail,
             'tagline' => $tagline,
+            'latestOffer' => $latestOffer,
             'footerServices' => $footerServices,
             'footerQuickLinks' => $footerQuickLinks,
             'socialLinks' => $socialLinks,

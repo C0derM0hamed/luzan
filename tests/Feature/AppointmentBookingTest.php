@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Appointment;
+use App\Models\Branch;
 use App\Models\Doctor;
 use App\Models\Service;
 use App\Models\User;
@@ -28,7 +29,9 @@ class AppointmentBookingTest extends TestCase
     {
         $this->seed();
 
+        $branch = Branch::query()->first();
         $doctor = Doctor::query()->first();
+        $doctor->branches()->syncWithoutDetaching([$branch->id]);
 
         $response = $this->post('/book', [
             'full_name' => 'محمد أحمد',
@@ -36,6 +39,7 @@ class AppointmentBookingTest extends TestCase
             'mobile' => '0500000000',
             'booking_type' => 'doctor',
             'doctor_id' => $doctor->id,
+            'branch_id' => $branch->id,
             'appointment_date' => now()->addDay()->format('Y-m-d'),
         ]);
 
@@ -45,6 +49,7 @@ class AppointmentBookingTest extends TestCase
         $this->assertDatabaseHas('appointments', [
             'full_name' => 'محمد أحمد',
             'doctor_id' => $doctor->id,
+            'branch_id' => $branch->id,
             'status' => Appointment::STATUS_PENDING,
         ]);
     }
@@ -53,6 +58,7 @@ class AppointmentBookingTest extends TestCase
     {
         $this->seed();
 
+        $branch = Branch::query()->first();
         $service = Service::query()->first();
 
         $response = $this->post('/book', [
@@ -61,6 +67,7 @@ class AppointmentBookingTest extends TestCase
             'mobile' => '0550000000',
             'booking_type' => 'specialty',
             'specialty' => $service->name,
+            'branch_id' => $branch->id,
             'appointment_date' => now()->addDays(2)->format('Y-m-d'),
         ]);
 
@@ -71,6 +78,7 @@ class AppointmentBookingTest extends TestCase
             'full_name' => 'سارة علي',
             'specialty' => $service->name,
             'doctor_id' => null,
+            'branch_id' => $branch->id,
             'status' => Appointment::STATUS_PENDING,
         ]);
     }
@@ -79,12 +87,15 @@ class AppointmentBookingTest extends TestCase
     {
         $this->seed();
 
-        $admin = User::query()->where('email', 'admin@luzan.com')->first();
+        $admin = User::factory()->create(['is_admin' => true]);
+        $branch = Branch::query()->first();
+
         $appointment = Appointment::query()->create([
             'full_name' => 'Test Patient',
             'national_id' => '1111111111',
             'mobile' => '0501111111',
             'specialty' => 'الطب العام',
+            'branch_id' => $branch->id,
             'appointment_date' => now()->addDay(),
             'status' => Appointment::STATUS_PENDING,
         ]);

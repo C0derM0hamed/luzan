@@ -61,6 +61,17 @@
                                 {{ $service->name }}
                             </h3>
                             
+                            @if($service->description)
+                                <p class="mt-2 text-sm text-slate-500 line-clamp-2 leading-relaxed">{{ $service->description }}</p>
+                            @endif
+                            
+                            @if($service->price)
+                                <div class="mt-4 inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-4 py-1.5 text-sm font-bold text-slate-700">
+                                    <span class="text-primary">{{ number_format($service->price, 2) }}</span>
+                                    <span class="text-xs text-slate-500">ر.س</span>
+                                </div>
+                            @endif
+                            
                             <!-- Decorative Line -->
                             <div class="mx-auto mt-4 h-1 w-8 rounded-full bg-slate-100 transition-all duration-300 group-hover:w-16 group-hover:bg-accent-blue"></div>
                             

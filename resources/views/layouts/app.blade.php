@@ -13,7 +13,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="bg-white text-[#444444] font-sans antialiased">
+<body class="bg-white text-[#444444] font-sans antialiased overflow-x-hidden">
     @include('components.navbar')
 
     <main>
@@ -21,6 +21,8 @@
     </main>
 
     @include('components.footer')
+
+    @include('components.offer-popup')
 
     @stack('scripts')
 </body>

@@ -54,6 +54,14 @@ class AdminViewComposer
                 'appointment_date' => 'تاريخ الموعد',
                 'status' => 'الحالة',
                 'notes' => 'ملاحظات',
+                'title' => 'العنوان',
+                'description' => 'الوصف',
+                'price' => 'السعر',
+                'start_date' => 'تاريخ البداية',
+                'end_date' => 'تاريخ النهاية',
+                'file' => 'الملف',
+                'patient_name' => 'اسم المريض',
+                'file_type' => 'نوع التقرير',
             ],
         ]);
     }

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Branch extends Model
 {
@@ -20,5 +22,15 @@ class Branch extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    public function doctors(): BelongsToMany
+    {
+        return $this->belongsToMany(Doctor::class)->withTimestamps();
+    }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
     }
 }

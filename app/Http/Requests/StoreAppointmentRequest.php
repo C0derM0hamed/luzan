@@ -15,6 +15,7 @@ class StoreAppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'branch_id' => ['required', 'exists:branches,id'],
             'full_name' => ['required', 'string', 'max:255'],
             'national_id' => ['required', 'string', 'max:20'],
             'mobile' => ['required', 'string', 'max:20'],
@@ -40,6 +41,8 @@ class StoreAppointmentRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'branch_id.required' => 'يجب اختيار الفرع.',
+            'branch_id.exists' => 'الفرع المختار غير صالح.',
             'full_name.required' => 'الاسم الكامل مطلوب.',
             'national_id.required' => 'رقم الهوية مطلوب.',
             'mobile.required' => 'رقم الجوال مطلوب.',

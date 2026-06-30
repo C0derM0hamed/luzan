@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\Branch;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class AppointmentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Appointment::query()->with('doctor')->latest();
+        $query = Appointment::query()->with(['doctor', 'branch'])->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->string('status'));
@@ -27,7 +28,7 @@ class AppointmentController extends Controller
             'pageTitle' => 'إدارة المواعيد',
             'appointments' => $appointments,
             'statusOptions' => Appointment::statusLabels(),
-            'tableHeaders' => ['#', 'الاسم', 'رقم الهوية', 'الجوال', 'الطبيب/التخصص', 'التاريخ', 'الحالة', 'إجراءات'],
+            'tableHeaders' => ['#', 'الاسم', 'رقم الهوية', 'الجوال', 'الفرع', 'الطبيب/التخصص', 'التاريخ', 'الحالة', 'إجراءات'],
             'filterLabels' => [
                 'status' => 'الحالة',
                 'date' => 'التاريخ',
@@ -39,12 +40,13 @@ class AppointmentController extends Controller
 
     public function show(Appointment $appointment)
     {
-        $appointment->load('doctor');
+        $appointment->load(['doctor', 'branch']);
 
         $fieldLabels = [
             'full_name' => 'الاسم الكامل',
             'national_id' => 'رقم الهوية',
             'mobile' => 'رقم الجوال',
+            'branch_id' => 'الفرع',
             'doctor_id' => 'الطبيب / التخصص',
             'appointment_date' => 'تاريخ الموعد',
             'status' => 'الحالة',
@@ -56,6 +58,7 @@ class AppointmentController extends Controller
             $fieldLabels['full_name'] => $appointment->full_name,
             $fieldLabels['national_id'] => $appointment->national_id,
             $fieldLabels['mobile'] => $appointment->mobile,
+            $fieldLabels['branch_id'] => $appointment->branch?->name ?? '—',
             $fieldLabels['doctor_id'] => $appointment->bookingTargetLabel(),
             $fieldLabels['appointment_date'] => $appointment->appointment_date->format('Y-m-d'),
             $fieldLabels['status'] => Appointment::statusLabels()[$appointment->status] ?? $appointment->status,
@@ -72,13 +75,15 @@ class AppointmentController extends Controller
 
     public function edit(Appointment $appointment)
     {
-        $appointment->load('doctor');
+        $appointment->load(['doctor', 'branch']);
         $doctors = Doctor::query()->where('is_active', true)->orderBy('name')->get();
+        $branches = Branch::query()->where('is_active', true)->orderBy('name')->get();
 
         return view('admin.appointments.edit', [
             'pageTitle' => 'تعديل الموعد',
             'appointment' => $appointment,
             'doctors' => $doctors,
+            'branches' => $branches,
             'statusOptions' => Appointment::statusLabels(),
         ]);
     }
@@ -89,6 +94,7 @@ class AppointmentController extends Controller
             'full_name' => ['required', 'string', 'max:255'],
             'national_id' => ['required', 'string', 'max:20'],
             'mobile' => ['required', 'string', 'max:20'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
             'doctor_id' => ['nullable', 'exists:doctors,id'],
             'specialty' => ['nullable', 'string', 'max:255'],
             'appointment_date' => ['required', 'date'],

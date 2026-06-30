@@ -12,6 +12,20 @@
     </div>
     
     <div>
+        <label class="mb-2 block text-sm font-semibold text-[#1e293b]">الفروع</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+            @foreach($branches as $branch)
+                <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-primary/50 transition-colors">
+                    <input type="checkbox" name="branches[]" value="{{ $branch->id }}" 
+                        @checked(in_array($branch->id, old('branches', isset($doctor) ? $doctor->branches->pluck('id')->toArray() : [])))
+                        class="h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary transition-all">
+                    <span class="text-sm text-slate-700">{{ $branch->name }}</span>
+                </label>
+            @endforeach
+        </div>
+    </div>
+    
+    <div>
         <label for="working_hours" class="mb-2 block text-sm font-semibold text-[#1e293b]">{{ $fieldLabels['working_hours'] }}</label>
         <textarea name="working_hours" id="working_hours" rows="3" required 
             class="w-full rounded-xl border border-slate-250 bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 hover:border-slate-350">{{ old('working_hours', $doctor->working_hours ?? '') }}</textarea>

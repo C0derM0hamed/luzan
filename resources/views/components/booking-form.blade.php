@@ -46,8 +46,28 @@
         @endif
 
         <!-- Booking Form -->
-        <form action="{{ route('appointments.store') }}" method="POST" class="space-y-6" x-data="{ bookingType: '{{ old('booking_type', 'doctor') }}' }">
+        <form action="{{ route('appointments.store') }}" method="POST" class="space-y-6" x-data="bookingForm('{{ old('branch_id') }}', '{{ old('doctor_id') }}', '{{ old('booking_type', 'doctor') }}')">
             @csrf
+
+            <!-- Branch Dropdown -->
+            <div class="relative">
+                <label for="branch_id" class="mb-2 block text-xs font-bold text-slate-700">الفرع المفضل</label>
+                <div class="relative">
+                    <select name="branch_id" id="branch_id" required x-model="branchId" @change="fetchDoctors"
+                        class="h-12 w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50/50 pr-11 pl-10 text-sm outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10 hover:border-slate-300">
+                        <option value="" disabled selected>اختر الفرع...</option>
+                        @foreach($branches as $branch)
+                            <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                        @endforeach
+                    </select>
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </span>
+                    <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-450">
+                        <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </span>
+                </div>
+            </div>
 
             <!-- Name Input -->
             <div class="relative">
@@ -97,7 +117,7 @@
             <!-- Booking Type Tabs -->
             <div>
                 <label class="mb-3 block text-xs font-bold text-slate-700">نوع الحجز</label>
-                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
                     <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all duration-300 select-none" 
                         :class="bookingType === 'doctor' ? 'bg-white text-primary shadow-sm border border-slate-100' : 'text-slate-500 hover:text-slate-800'">
                         <input type="radio" name="booking_type" value="doctor" x-model="bookingType" class="sr-only">
@@ -122,16 +142,22 @@
             <div class="relative" x-show="bookingType === 'doctor'" x-cloak x-transition>
                 <label for="doctor_id" class="mb-2 block text-xs font-bold text-slate-700">اختر الطبيب المعالج</label>
                 <div class="relative">
-                    <select name="doctor_id" id="doctor_id" :required="bookingType === 'doctor'" :disabled="bookingType !== 'doctor'" 
-                        class="h-12 w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50/50 pr-11 pl-10 text-sm outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10 hover:border-slate-300 disabled:bg-slate-100">
-                        <option value="" disabled {{ old('doctor_id') ? '' : 'selected' }}>اختر طبيب العيادة...</option>
-                        @foreach($doctors as $doctor)
-                            <option value="{{ $doctor->id }}" @selected(old('doctor_id') == $doctor->id)>{{ $doctor->name }} ({{ $doctor->specialty }})</option>
-                        @endforeach
+                    <select name="doctor_id" id="doctor_id" :required="bookingType === 'doctor'" :disabled="bookingType !== 'doctor' || loadingDoctors" x-model="doctorId"
+                        class="h-12 w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50/50 pr-11 pl-10 text-sm outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10 hover:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400">
+                        <option value="" disabled selected x-text="loadingDoctors ? 'جاري تحميل الأطباء...' : (!branchId ? 'يرجى اختيار الفرع أولاً' : (doctors.length === 0 ? 'لا يوجد أطباء في هذا الفرع' : 'اختر طبيب العيادة...'))"></option>
+                        <template x-for="doc in doctors" :key="doc.id">
+                            <option :value="doc.id" x-text="`${doc.name} (${doc.specialty})`"></option>
+                        </template>
                     </select>
-                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" x-show="!loadingDoctors">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                        </svg>
+                    </span>
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-primary" x-show="loadingDoctors" x-cloak>
+                        <svg class="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                     </span>
                     <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-450">
@@ -190,3 +216,44 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function bookingForm(oldBranch, oldDoctor, oldType) {
+        return {
+            branchId: oldBranch || '',
+            doctorId: oldDoctor || '',
+            bookingType: oldType || 'doctor',
+            doctors: [],
+            loadingDoctors: false,
+            
+            init() {
+                if (this.branchId) {
+                    this.fetchDoctors();
+                }
+            },
+            
+            fetchDoctors() {
+                if (!this.branchId) return;
+                
+                this.loadingDoctors = true;
+                this.doctorId = '';
+                
+                fetch(`/api/branches/${this.branchId}/doctors`)
+                    .then(res => res.json())
+                    .then(data => {
+                        this.doctors = data;
+                        if (oldDoctor && data.find(d => d.id == oldDoctor)) {
+                            this.doctorId = oldDoctor;
+                            oldDoctor = null; // only use once
+                        }
+                    })
+                    .catch(err => console.error('Error fetching doctors:', err))
+                    .finally(() => {
+                        this.loadingDoctors = false;
+                    });
+            }
+        };
+    }
+</script>
+@endpush

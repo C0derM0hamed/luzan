@@ -9,6 +9,8 @@ class Service extends Model
     protected $fillable = [
         'name',
         'icon_svg',
+        'description',
+        'price',
         'is_active',
         'sort_order',
     ];
@@ -18,6 +20,7 @@ class Service extends Model
         return [
             'is_active' => 'boolean',
             'sort_order' => 'integer',
+            'price' => 'decimal:2',
         ];
     }
 }
