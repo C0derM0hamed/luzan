@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AiAssistantController as AdminAiAssistantController;
+use App\Http\Controllers\Admin\AiUsageAnalyticsController;
 use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\BranchController as AdminBranchController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\Admin\OfferController as AdminOfferController;
 use App\Http\Controllers\Admin\PatientReportController as AdminPatientReportController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
+use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PatientPortalController;
@@ -38,6 +41,10 @@ Route::prefix('reports')->name('reports.')->group(function () {
 
 Route::get('/api/branches/{branch}/doctors', [HomeController::class, 'branchDoctors'])->name('api.branch.doctors');
 
+Route::post('/api/ai/chat', [AiChatController::class, 'chat'])
+    ->middleware('throttle:30,1')
+    ->name('api.ai.chat');
+
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
@@ -63,6 +70,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('settings', [AdminSettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [AdminSettingController::class, 'update'])->name('settings.update');
+        Route::get('ai-assistant', [AdminAiAssistantController::class, 'edit'])->name('ai-assistant.edit');
+        Route::put('ai-assistant', [AdminAiAssistantController::class, 'update'])->name('ai-assistant.update');
+        Route::get('ai-assistant/analytics', [AiUsageAnalyticsController::class, 'index'])->name('ai-assistant.analytics');
         Route::get('profile', [AdminAuthController::class, 'editProfile'])->name('profile.edit');
         Route::put('profile', [AdminAuthController::class, 'updateProfile'])->name('profile.update');
     });

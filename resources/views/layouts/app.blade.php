@@ -24,6 +24,8 @@
 
     @include('components.offer-popup')
 
+    @include('components.ai-assistant')
+
     @stack('scripts')
 </body>
 </html>

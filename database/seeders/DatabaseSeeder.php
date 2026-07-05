@@ -40,6 +40,19 @@ class DatabaseSeeder extends Seeder
             ['key' => 'facebook', 'value' => '#', 'group' => 'social'],
             ['key' => 'meta_title', 'value' => 'مجمع لوزان التخصصي الطبي', 'group' => 'seo'],
             ['key' => 'meta_description', 'value' => 'رعاية طبية متخصصة في قلوة ونمرة', 'group' => 'seo'],
+            ['key' => 'ai_enabled', 'value' => '0', 'group' => 'ai_assistant'],
+            ['key' => 'ai_provider', 'value' => 'gemini', 'group' => 'ai_assistant'],
+            ['key' => 'ai_temperature', 'value' => '0.3', 'group' => 'ai_assistant'],
+            ['key' => 'ai_max_tokens', 'value' => '900', 'group' => 'ai_assistant'],
+            ['key' => 'ai_gemini_enabled', 'value' => '1', 'group' => 'ai_assistant'],
+            ['key' => 'ai_openrouter_enabled', 'value' => '1', 'group' => 'ai_assistant'],
+            ['key' => 'ai_openai_enabled', 'value' => '1', 'group' => 'ai_assistant'],
+            ['key' => 'ai_gemini_model', 'value' => 'gemini-2.0-flash', 'group' => 'ai_assistant'],
+            ['key' => 'ai_openrouter_model', 'value' => 'google/gemini-2.0-flash-exp:free', 'group' => 'ai_assistant'],
+            ['key' => 'ai_openai_model', 'value' => 'gpt-4o-mini', 'group' => 'ai_assistant'],
+            ['key' => 'ai_daily_limit', 'value' => '50', 'group' => 'ai_assistant'],
+            ['key' => 'ai_chat_history_enabled', 'value' => '1', 'group' => 'ai_assistant'],
+            ['key' => 'ai_logging_enabled', 'value' => '1', 'group' => 'ai_assistant'],
         ];
 
         foreach ($defaultSettings as $setting) {

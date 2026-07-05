@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\Otp\EmailOtpService;
+use App\Services\Otp\OtpServiceInterface;
 use App\View\Composers\AdminViewComposer;
 use App\View\Composers\PublicLayoutComposer;
 use Illuminate\Support\Facades\URL;
@@ -13,13 +15,12 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-            \App\Services\Otp\OtpServiceInterface::class,
-            \App\Services\Otp\EmailOtpService::class
+            OtpServiceInterface::class,
+            EmailOtpService::class
         );
     }
 
     public function boot(): void
-
     {
         View::composer([
             'layouts.app',

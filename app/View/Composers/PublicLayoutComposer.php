@@ -2,15 +2,18 @@
 
 namespace App\View\Composers;
 
-use App\Models\Appointment;
 use App\Models\Offer;
 use App\Models\Service;
+use App\Services\AiAssistant\AiSettingsService;
 use App\Services\SettingService;
 use Illuminate\View\View;
 
 class PublicLayoutComposer
 {
-    public function __construct(private SettingService $settings) {}
+    public function __construct(
+        private SettingService $settings,
+        private AiSettingsService $aiSettings,
+    ) {}
 
     public function compose(View $view): void
     {
@@ -75,6 +78,7 @@ class PublicLayoutComposer
             'servicesShowAllLabel' => 'عرض جميع الخدمات',
             'doctorsShowAllUrl' => route('doctors'),
             'doctorsShowAllLabel' => 'عرض جميع الأطباء',
+            'aiAssistant' => $this->aiSettings->getPublicConfig(),
         ]);
     }
 
