@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -9,24 +9,61 @@
 @theme {
     --font-sans: 'Cairo', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
-    --color-primary: #0a7075;
-    --color-primary-dark: #075a5e;
-    --color-accent-blue: #00b4d8;
-    --color-accent-red: #e63946;
-    --color-body: #444444;
-    --color-muted: #888888;
-    --color-border: #e0e0e0;
-    --color-surface: #f9f9f9;
+    --color-primary: #00a99d;
+    --color-primary-dark: #00877e;
+    --color-primary-light: #d1fae5;
+    --color-accent-blue: #0ea5e9;
+    --color-accent-red: #f43f5e;
+    --color-body: #334155;
+    --color-muted: #64748b;
+    --color-border: #f1f5f9;
+    --color-surface: #fafafa;
+    
+    --shadow-premium: 0 10px 30px -10px rgba(0, 169, 157, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
+    --shadow-premium-hover: 0 20px 40px -15px rgba(0, 169, 157, 0.15), 0 1px 10px rgba(0, 0, 0, 0.03);
+    --shadow-glow: 0 0 25px rgba(0, 169, 157, 0.15);
 }
 
 @layer base {
     html {
         font-size: 16px;
+        scroll-behavior: smooth;
     }
 
     body {
         font-family: 'Cairo', sans-serif;
+        background-color: #fcfcfc;
+        color: var(--color-body);
+        -webkit-font-smoothing: antialiased;
     }
+}
+
+/* ── Premium Layout & Cards Utilities ── */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.premium-card {
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    box-shadow: var(--shadow-premium);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.premium-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-premium-hover);
+    border-color: rgba(0, 169, 157, 0.15);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 [x-cloak] {
