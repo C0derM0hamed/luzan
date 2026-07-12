@@ -9,7 +9,9 @@ class GeminiProvider implements AiProviderInterface
 {
     private const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
-    public function __construct(private readonly string $apiKey) {}
+    public function __construct(private readonly string $apiKey)
+    {
+    }
 
     public function name(): string
     {
@@ -22,12 +24,17 @@ class GeminiProvider implements AiProviderInterface
 
         try {
             $response = Http::withHeaders(['Content-Type' => 'application/json'])
+                ->retry(2, 300, function (\Throwable $exception, \Illuminate\Http\Client\Request $request) {
+                    if ($exception instanceof \Illuminate\Http\Client\ConnectionException)
+                        return true;
+                    return false;
+                })
                 ->timeout(45)
                 ->connectTimeout(10)
-                ->post(self::BASE_URL.'/models/'.urlencode($model).':generateContent?key='.urlencode($this->apiKey), $payload);
+                ->post(self::BASE_URL . '/models/' . urlencode($model) . ':generateContent?key=' . urlencode($this->apiKey), $payload);
         } catch (\Throwable $e) {
             throw new AiProviderException(
-                'Gemini connection failed: '.$e->getMessage(),
+                'Gemini connection failed: ' . $e->getMessage(),
                 statusCode: 503,
                 provider: $this->name(),
             );
@@ -41,10 +48,10 @@ class GeminiProvider implements AiProviderInterface
         try {
             $response = Http::timeout(20)
                 ->connectTimeout(10)
-                ->get(self::BASE_URL.'/models/'.urlencode($model), ['key' => $apiKey]);
+                ->get(self::BASE_URL . '/models/' . urlencode($model), ['key' => $apiKey]);
         } catch (\Throwable $e) {
             throw new AiProviderException(
-                'Gemini validation connection failed: '.$e->getMessage(),
+                'Gemini validation connection failed: ' . $e->getMessage(),
                 userMessage: 'تعذر التحقق من مفتاح Gemini. يرجى التحقق من الاتصال بالإنترنت.',
                 statusCode: 422,
                 eligibleForFallback: false,
@@ -72,9 +79,9 @@ class GeminiProvider implements AiProviderInterface
             );
         }
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             throw new AiProviderException(
-                'Gemini validation failed: '.$response->body(),
+                'Gemini validation failed: ' . $response->body(),
                 userMessage: 'فشل التحقق من مفتاح Gemini. يرجى التأكد من صحة المفتاح والنموذج.',
                 statusCode: 422,
                 eligibleForFallback: false,
@@ -143,9 +150,9 @@ class GeminiProvider implements AiProviderInterface
             );
         }
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             throw new AiProviderException(
-                'Gemini API error: '.$response->body(),
+                'Gemini API error: ' . $response->body(),
                 statusCode: 502,
                 provider: $this->name(),
             );
@@ -154,7 +161,7 @@ class GeminiProvider implements AiProviderInterface
         $data = $response->json();
         $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
 
-        if (! is_string($content) || trim($content) === '') {
+        if (!is_string($content) || trim($content) === '') {
             throw new AiProviderException(
                 'Empty Gemini response',
                 userMessage: 'عذراً، لم أتمكن من توليد رد مناسب. يرجى إعادة صياغة سؤالك.',

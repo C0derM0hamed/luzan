@@ -169,7 +169,7 @@ TEXT;
 
     public function getMaxTokens(): int
     {
-        return max(100, min(4000, (int) $this->settings->get('ai_max_tokens', 900)));
+        return max(100, min(8000, (int) $this->settings->get('ai_max_tokens', 2048)));
     }
 
     public function getSystemInstructions(): string
@@ -254,7 +254,7 @@ TEXT;
         }
 
         if (isset($data['ai_max_tokens'])) {
-            $this->settings->set('ai_max_tokens', (string) max(100, min(4000, (int) $data['ai_max_tokens'])), self::GROUP);
+            $this->settings->set('ai_max_tokens', (string) max(100, min(8000, (int) $data['ai_max_tokens'])), self::GROUP);
         }
 
         if (array_key_exists('ai_system_instructions', $data)) {

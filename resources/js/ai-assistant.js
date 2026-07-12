@@ -177,7 +177,7 @@ function aiAssistant(config) {
             html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
             html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
             html = html.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
-            html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener" class="ai-assistant-link">$1</a>');
+            html = html.replace(/(https?:\/\/[^\s<]+?(?=[.,:;"')\]]*(?:\s|<|$)))/g, '<a href="$1" target="_blank" rel="noopener" class="ai-assistant-link">$1</a>');
 
             return html;
         },

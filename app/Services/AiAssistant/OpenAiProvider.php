@@ -11,7 +11,9 @@ class OpenAiProvider implements AiProviderInterface
 
     private const MODELS_URL = 'https://api.openai.com/v1/models';
 
-    public function __construct(private readonly string $apiKey) {}
+    public function __construct(private readonly string $apiKey)
+    {
+    }
 
     public function name(): string
     {
@@ -22,9 +24,14 @@ class OpenAiProvider implements AiProviderInterface
     {
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer '.$this->apiKey,
+                'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
             ])
+                ->retry(2, 300, function (\Throwable $exception, \Illuminate\Http\Client\Request $request) {
+                    if ($exception instanceof \Illuminate\Http\Client\ConnectionException)
+                        return true;
+                    return false;
+                })
                 ->timeout(45)
                 ->connectTimeout(10)
                 ->post(self::API_URL, [
@@ -35,7 +42,7 @@ class OpenAiProvider implements AiProviderInterface
                 ]);
         } catch (\Throwable $e) {
             throw new AiProviderException(
-                'OpenAI connection failed: '.$e->getMessage(),
+                'OpenAI connection failed: ' . $e->getMessage(),
                 statusCode: 503,
                 provider: $this->name(),
             );
@@ -48,14 +55,14 @@ class OpenAiProvider implements AiProviderInterface
     {
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer '.$apiKey,
+                'Authorization' => 'Bearer ' . $apiKey,
             ])
                 ->timeout(20)
                 ->connectTimeout(10)
                 ->get(self::MODELS_URL);
         } catch (\Throwable $e) {
             throw new AiProviderException(
-                'OpenAI validation connection failed: '.$e->getMessage(),
+                'OpenAI validation connection failed: ' . $e->getMessage(),
                 userMessage: 'تعذر التحقق من مفتاح OpenAI. يرجى التحقق من الاتصال بالإنترنت.',
                 statusCode: 422,
                 eligibleForFallback: false,
@@ -73,9 +80,9 @@ class OpenAiProvider implements AiProviderInterface
             );
         }
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             throw new AiProviderException(
-                'OpenAI validation failed: '.$response->body(),
+                'OpenAI validation failed: ' . $response->body(),
                 userMessage: 'فشل التحقق من مفتاح OpenAI. يرجى التأكد من صحة المفتاح.',
                 statusCode: 422,
                 eligibleForFallback: false,
@@ -106,9 +113,9 @@ class OpenAiProvider implements AiProviderInterface
             );
         }
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             throw new AiProviderException(
-                'OpenAI API error: '.$response->body(),
+                'OpenAI API error: ' . $response->body(),
                 statusCode: 502,
                 provider: $this->name(),
             );
@@ -117,7 +124,7 @@ class OpenAiProvider implements AiProviderInterface
         $data = $response->json();
         $content = $data['choices'][0]['message']['content'] ?? null;
 
-        if (! is_string($content) || trim($content) === '') {
+        if (!is_string($content) || trim($content) === '') {
             throw new AiProviderException(
                 'Empty OpenAI response',
                 userMessage: 'عذراً، لم أتمكن من توليد رد مناسب. يرجى إعادة صياغة سؤالك.',

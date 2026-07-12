@@ -64,7 +64,7 @@
                         </div>
                         <div>
                             <label for="ai_max_tokens" class="mb-1 block text-sm font-semibold">Max Tokens</label>
-                            <input type="number" name="ai_max_tokens" id="ai_max_tokens" min="100" max="4000" value="{{ old('ai_max_tokens', $settings['ai_max_tokens']) }}" class="h-11 w-full rounded border border-border px-3 text-sm" dir="ltr">
+                            <input type="number" name="ai_max_tokens" id="ai_max_tokens" min="100" max="8000" value="{{ old('ai_max_tokens', $settings['ai_max_tokens']) }}" class="h-11 w-full rounded border border-border px-3 text-sm" dir="ltr">
                         </div>
                     </div>
                 </div>
