@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\Doctor;
 use App\Models\Offer;
 use App\Models\Service;
+use App\Services\SettingService;
 use Illuminate\Http\JsonResponse;
 
 class HomeController extends Controller
@@ -52,6 +53,18 @@ class HomeController extends Controller
         return view('pages.about');
     }
 
+    public function privacy(SettingService $settings)
+    {
+        $privacyContent = $settings->get('privacy_content', 'سياسة الخصوصية غير متوفرة حالياً.');
+        return view('pages.privacy', compact('privacyContent'));
+    }
+
+    public function terms(SettingService $settings)
+    {
+        $termsContent = $settings->get('terms_content', 'شروط الاستخدام غير متوفرة حالياً.');
+        return view('pages.terms', compact('termsContent'));
+    }
+
     public function contact()
     {
         $branches = Branch::query()->where('is_active', true)->get();
@@ -62,7 +75,7 @@ class HomeController extends Controller
     {
         $branches = Branch::query()
             ->where('is_active', true)
-            ->with(['doctors' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
+            ->with(['doctors' => fn($q) => $q->where('is_active', true)->orderBy('name')])
             ->orderBy('name')
             ->get();
 

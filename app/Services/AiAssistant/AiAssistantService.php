@@ -14,7 +14,8 @@ class AiAssistantService
         private AiUsageTracker $usageTracker,
         private AiProviderFactory $providerFactory,
         private AiUsageRecorder $usageRecorder,
-    ) {}
+    ) {
+    }
 
     /**
      * @param  array<int, array{role: string, content: string}>  $history
@@ -22,7 +23,7 @@ class AiAssistantService
      */
     public function chat(string $message, array $history, string $sessionId, string $identifier, ?string $ipAddress): array
     {
-        if (! $this->settings->isEnabled()) {
+        if (!$this->settings->isEnabled()) {
             throw new AiProviderException(
                 'AI assistant is disabled',
                 userMessage: 'المساعد الذكي غير متاح حالياً. يرجى التواصل مع العيادة مباشرة.',
@@ -42,7 +43,7 @@ class AiAssistantService
             );
         }
 
-        if (! $this->usageTracker->hasRemainingQuota($identifier)) {
+        if (!$this->usageTracker->hasRemainingQuota($identifier)) {
             throw new AiProviderException(
                 'Daily usage limit reached',
                 userMessage: 'تم الوصول إلى الحد اليومي لاستخدام المساعد الذكي. يرجى المحاولة غداً أو التواصل مع العيادة.',
@@ -80,7 +81,7 @@ class AiAssistantService
                         'ip_address' => $ipAddress,
                         'user_message' => $message,
                         'assistant_message' => $result['content'],
-                        'model' => $result['provider'].':'.$result['model'],
+                        'model' => $result['provider'] . ':' . $result['model'],
                         'tokens_used' => $result['tokens_used'],
                         'status' => 'success',
                     ]);
@@ -130,20 +131,23 @@ class AiAssistantService
      */
     private function buildMessages(string $message, array $history): array
     {
-        $systemContent = $this->settings->getSystemInstructions()
-            ."\n\n--- سياق بيانات المجمع (المصدر الوحيد للمعلومات) ---\n\n"
-            .$this->contextBuilder->build();
+        $messages = [];
+        $instructions = $this->settings->getSystemInstructions();
 
-        $messages = [
-            ['role' => 'system', 'content' => $systemContent],
-        ];
+        if ($instructions !== '') {
+            $systemContent = $instructions
+                . "\n\n--- سياق بيانات المجمع (المصدر الوحيد للمعلومات) ---\n\n"
+                . $this->contextBuilder->build();
+
+            $messages[] = ['role' => 'system', 'content' => $systemContent];
+        }
 
         foreach ($history as $entry) {
-            if (! isset($entry['role'], $entry['content'])) {
+            if (!isset($entry['role'], $entry['content'])) {
                 continue;
             }
 
-            if (! in_array($entry['role'], ['user', 'assistant'], true)) {
+            if (!in_array($entry['role'], ['user', 'assistant'], true)) {
                 continue;
             }
 

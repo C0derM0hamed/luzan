@@ -27,6 +27,8 @@ class SettingController extends Controller
         'facebook',
         'meta_title',
         'meta_description',
+        'privacy_content',
+        'terms_content',
     ];
 
     private const GROUP_MAP = [
@@ -47,6 +49,8 @@ class SettingController extends Controller
         'facebook' => 'social',
         'meta_title' => 'seo',
         'meta_description' => 'seo',
+        'privacy_content' => 'content',
+        'terms_content' => 'content',
     ];
 
     public function edit(SettingService $settings)
@@ -89,6 +93,13 @@ class SettingController extends Controller
                 'fields' => [
                     ['key' => 'meta_title', 'label' => 'عنوان الصفحة'],
                     ['key' => 'meta_description', 'label' => 'وصف الصفحة', 'type' => 'textarea'],
+                ],
+            ],
+            [
+                'title' => 'الصفحات القانونية',
+                'fields' => [
+                    ['key' => 'privacy_content', 'label' => 'سياسة الخصوصية', 'type' => 'textarea', 'rows' => 8],
+                    ['key' => 'terms_content', 'label' => 'شروط الاستخدام', 'type' => 'textarea', 'rows' => 8],
                 ],
             ],
         ];

@@ -94,11 +94,12 @@
                         <div>
                             <label for="{{ $apiKeyField }}" class="mb-1 block text-sm font-semibold">مفتاح API — {{ $definition['label'] }}</label>
                             <input
-                                type="password"
+                                type="text"
                                 name="{{ $apiKeyField }}"
                                 id="{{ $apiKeyField }}"
-                                autocomplete="new-password"
-                                placeholder="{{ $providerSettings['has_api_key'] ? '•••••••••••••••• (اتركه فارغاً للإبقاء على المفتاح الحالي)' : $definition['key_placeholder'] }}"
+                                autocomplete="off"
+                                value="{{ old($apiKeyField, $providerSettings['api_key']) }}"
+                                placeholder="{{ $definition['key_placeholder'] }}"
                                 class="h-11 w-full rounded border px-3 text-sm font-mono @error($apiKeyField) border-red-400 @else border-border @enderror"
                                 dir="ltr"
                             >
@@ -110,7 +111,7 @@
                                     تم تعيين مفتاح API — يُتحقق منه قبل الحفظ
                                 </p>
                             @else
-                                <p class="mt-1 text-xs text-muted">يُتحقق من صحة المفتاح قبل الحفظ. لا يُعرض أبداً للزوار.</p>
+                                <p class="mt-1 text-xs text-muted">يُتحقق من صحة المفتاح قبل الحفظ.</p>
                             @endif
                         </div>
 

@@ -33,7 +33,9 @@ TEXT;
 
 كيف يمكنني مساعدتك اليوم؟';
 
-    public function __construct(private SettingService $settings) {}
+    public function __construct(private SettingService $settings)
+    {
+    }
 
     public function isEnabled(): bool
     {
@@ -64,7 +66,7 @@ TEXT;
         $settingKey = $this->providerApiKeySetting($provider);
         $encrypted = $this->settings->get($settingKey);
 
-        if (! is_string($encrypted) || trim($encrypted) === '') {
+        if (!is_string($encrypted) || trim($encrypted) === '') {
             return null;
         }
 
@@ -172,9 +174,13 @@ TEXT;
 
     public function getSystemInstructions(): string
     {
-        $custom = trim((string) $this->settings->get('ai_system_instructions', ''));
+        $custom = $this->settings->get('ai_system_instructions');
 
-        return $custom !== '' ? $custom : self::DEFAULT_INSTRUCTIONS;
+        if ($custom === null) {
+            return self::DEFAULT_INSTRUCTIONS;
+        }
+
+        return trim((string) $custom);
     }
 
     public function getWelcomeMessage(): string
@@ -275,7 +281,7 @@ TEXT;
             }
 
             $apiKeyField = "ai_{$provider}_api_key";
-            if (! empty($data[$apiKeyField])) {
+            if (!empty($data[$apiKeyField])) {
                 $this->setProviderApiKey($provider, (string) $data[$apiKeyField]);
             }
         }
@@ -294,6 +300,7 @@ TEXT;
             $providers[$provider] = [
                 'enabled' => $this->isProviderEnabled($provider),
                 'has_api_key' => $this->hasProviderApiKey($provider),
+                'api_key' => $this->getProviderApiKey($provider),
                 'model' => $this->getProviderModel($provider),
             ];
         }
@@ -303,7 +310,7 @@ TEXT;
             'ai_provider' => $this->getPrimaryProvider(),
             'ai_temperature' => $this->getTemperature(),
             'ai_max_tokens' => $this->getMaxTokens(),
-            'ai_system_instructions' => $this->settings->get('ai_system_instructions', self::DEFAULT_INSTRUCTIONS),
+            'ai_system_instructions' => $this->settings->get('ai_system_instructions') ?? self::DEFAULT_INSTRUCTIONS,
             'ai_welcome_message' => $this->settings->get('ai_welcome_message', self::DEFAULT_WELCOME),
             'ai_daily_limit' => $this->getDailyLimit(),
             'ai_chat_history_enabled' => $this->isChatHistoryEnabled(),
