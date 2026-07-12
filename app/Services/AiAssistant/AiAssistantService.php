@@ -133,6 +133,7 @@ class AiAssistantService
     {
         $messages = [];
         $instructions = $this->settings->getSystemInstructions();
+        $systemContent = '';
 
         if ($instructions !== '') {
             $systemContent = $instructions
@@ -142,25 +143,37 @@ class AiAssistantService
             $messages[] = ['role' => 'system', 'content' => $systemContent];
         }
 
-        foreach ($history as $entry) {
-            if (!isset($entry['role'], $entry['content'])) {
-                continue;
-            }
+        $maxHistoryChars = 12000;
+        $currentChars = mb_strlen($systemContent) + mb_strlen($message);
 
-            if (!in_array($entry['role'], ['user', 'assistant'], true)) {
+        $validHistory = [];
+
+        foreach (array_reverse($history) as $entry) {
+            if (!isset($entry['role'], $entry['content']) || !in_array($entry['role'], ['user', 'assistant'], true)) {
                 continue;
             }
 
             $content = trim((string) $entry['content']);
-
             if ($content === '') {
                 continue;
             }
 
-            $messages[] = [
+            $content = Str::limit($content, 2000, '');
+            $entryLength = mb_strlen($content);
+
+            if ($currentChars + $entryLength > $maxHistoryChars) {
+                break; // Stop adding older messages to avoid hitting input token limits
+            }
+
+            $currentChars += $entryLength;
+            $validHistory[] = [
                 'role' => $entry['role'],
-                'content' => Str::limit($content, 2000, ''),
+                'content' => $content,
             ];
+        }
+
+        foreach (array_reverse($validHistory) as $entry) {
+            $messages[] = $entry;
         }
 
         $messages[] = ['role' => 'user', 'content' => trim($message)];
